@@ -25,7 +25,7 @@ from superset.constants import TimeGrain
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
 
 
-class PhoenixEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class PhoenixEngineSpec(BaseEngineSpec):
     """Dialect for Apache Phoenix"""
 
     engine = "phoenix"

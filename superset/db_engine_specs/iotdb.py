@@ -19,7 +19,7 @@ from __future__ import annotations
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
 
 
-class IoTDBEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class IoTDBEngineSpec(BaseEngineSpec):
     """Dialect for Apache IoTDB"""
 
     engine = "iotdb"

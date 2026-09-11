@@ -29,7 +29,7 @@ from superset.errors import SupersetErrorType
 
 
 # Internal class for defining error message patterns (for translation)
-class _ErrorPatterns:  # pylint: disable=too-few-public-methods
+class _ErrorPatterns:
     CONN_INVALID_USER_PWD_REGEX = re.compile("The username or password is incorrect")
     CONN_INVALID_PWD_NEEDED_REGEX = re.compile("no password supplied")
     CONN_INVALID_HOSTNAME_REGEX = re.compile(
@@ -181,7 +181,6 @@ class DenodoEngineSpec(BaseEngineSpec, BasicParametersMixin):
 
     @classmethod
     def get_datatype(cls, type_code: Any) -> Optional[str]:
-        # pylint: disable=import-outside-toplevel
         from psycopg2.extensions import binary_types, string_types
 
         # Obtain data type names from psycopg2

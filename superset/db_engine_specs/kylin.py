@@ -23,7 +23,7 @@ from superset.constants import TimeGrain
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
 
 
-class KylinEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class KylinEngineSpec(BaseEngineSpec):
     """Dialect for Apache Kylin"""
 
     engine = "kylin"

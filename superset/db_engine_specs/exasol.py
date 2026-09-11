@@ -20,7 +20,7 @@ from superset.constants import TimeGrain
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
 
 
-class ExasolEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class ExasolEngineSpec(BaseEngineSpec):
     """Engine spec for Exasol"""
 
     engine = "exa"

@@ -413,6 +413,6 @@ class RedshiftEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
                 f"WHERE procpid='{cancel_query_id}'"
             )
             cursor.close()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
         return True

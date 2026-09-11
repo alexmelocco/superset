@@ -70,7 +70,7 @@ def strip_array_brackets(kql: str) -> str:
     return "".join(val for _, val in tokens)
 
 
-class KustoSqlEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class KustoSqlEngineSpec(BaseEngineSpec):
     limit_method = LimitMethod.WRAP_SQL
     engine = "kustosql"
     engine_name = "Azure Data Explorer"
@@ -179,7 +179,6 @@ class KustoSqlEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel,import-error
         import sqlalchemy_kusto.errors as kusto_exceptions
 
         return {
@@ -208,7 +207,7 @@ class KustoSqlEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
         return None
 
 
-class KustoKqlEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class KustoKqlEngineSpec(BaseEngineSpec):
     """Azure Data Explorer engine spec using native KQL query language.
 
     Note: Documentation is consolidated in KustoSqlEngineSpec (Azure Data Explorer).
@@ -249,7 +248,6 @@ class KustoKqlEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel,import-error
         import sqlalchemy_kusto.errors as kusto_exceptions
 
         return {

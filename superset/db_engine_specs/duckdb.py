@@ -107,7 +107,7 @@ class DuckDBParametersMixin:
         return "md:" in database
 
     @classmethod
-    def build_sqlalchemy_uri(  # pylint: disable=unused-argument
+    def build_sqlalchemy_uri(
         cls,
         parameters: DuckDBParametersType,
         encrypted_extra: dict[str, str] | None = None,
@@ -134,7 +134,7 @@ class DuckDBParametersMixin:
         return str(URL.create(drivername=cls.engine, database=database, query=query))
 
     @classmethod
-    def get_parameters_from_uri(  # pylint: disable=unused-argument
+    def get_parameters_from_uri(
         cls, uri: str, encrypted_extra: dict[str, Any] | None = None
     ) -> DuckDBParametersType:
         url = make_url_safe(uri)

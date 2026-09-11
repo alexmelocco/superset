@@ -128,7 +128,6 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
     }
 
     # when editing the database, mask this field in `encrypted_extra`
-    # pylint: disable=invalid-name
     encrypted_extra_sensitive_fields = {
         "$.service_account_info.private_key": "Service Account Private Key",
         "$.oauth2_client_info.secret": "OAuth2 Client Secret",
@@ -150,9 +149,7 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
     # OAuth 2.0
     supports_oauth2 = True
     oauth2_scope = " ".join(SCOPES)
-    oauth2_authorization_request_uri = (  # pylint: disable=invalid-name
-        "https://accounts.google.com/o/oauth2/v2/auth"
-    )
+    oauth2_authorization_request_uri = "https://accounts.google.com/o/oauth2/v2/auth"
     oauth2_token_request_uri = "https://oauth2.googleapis.com/token"  # noqa: S105
     oauth2_exception = (UnauthenticatedError, OAuth2TokenRefreshError)
 
@@ -296,13 +293,12 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
             results = cursor.fetchone()[0]
         try:
             metadata = json.loads(results)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             metadata = {}
 
         return {"metadata": metadata["extra"]}
 
     @classmethod
-    # pylint: disable=unused-argument
     def build_sqlalchemy_uri(
         cls,
         _: GSheetsParametersType,
@@ -344,7 +340,7 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
     @classmethod
     def get_parameters_from_uri(
         cls,
-        uri: str,  # pylint: disable=unused-argument
+        uri: str,
         encrypted_extra: dict[str, Any] | None = None,
     ) -> Any:
         # Building parameters from encrypted_extra and uri
@@ -468,7 +464,7 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
                 url = url.replace('"', '""')
                 results = conn.execute(text(f'SELECT * FROM "{url}" LIMIT 1'))  # noqa: S608
                 results.fetchall()
-            except Exception:  # pylint: disable=broad-except
+            except Exception:
                 errors.append(
                     SupersetError(
                         message=(
@@ -486,7 +482,7 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
 
     @staticmethod
     def _do_post(
-        session: Session,  # pylint: disable=disallowed-name
+        session: Session,
         url: str,
         body: dict[str, Any],
         **kwargs: Any,
@@ -513,7 +509,7 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
         return payload
 
     @classmethod
-    def df_to_sql(  # pylint: disable=too-many-locals
+    def df_to_sql(
         cls,
         database: Database,
         table: Table,
@@ -533,7 +529,6 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
         cells in the existing sheet before uploading the new data. Appending to an
         existing table is not supported because we can't ensure that the schemas match.
         """
-        # pylint: disable=import-outside-toplevel
         from shillelagh.backends.apsw.dialects.base import get_adapter_for_table_name
 
         # grab the existing catalog, if any
@@ -565,14 +560,12 @@ class GSheetsEngineSpec(ShillelaghEngineSpec):
                     conn,
                     spreadsheet_url or EXAMPLE_GSHEETS_URL,
                 )
-                session = (  # pylint: disable=disallowed-name
-                    adapter._get_session()  # pylint: disable=protected-access
-                )
+                session = adapter._get_session()
 
         # clear existing sheet, or create a new one
         if spreadsheet_url:
-            spreadsheet_id = adapter._spreadsheet_id  # pylint: disable=protected-access
-            range_ = adapter._sheet_name  # pylint: disable=protected-access
+            spreadsheet_id = adapter._spreadsheet_id
+            range_ = adapter._sheet_name
             url = (
                 "https://sheets.googleapis.com/v4/spreadsheets/"
                 f"{spreadsheet_id}/values/{range_}:clear"

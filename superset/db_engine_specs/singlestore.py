@@ -584,7 +584,7 @@ class SingleStoreSpec(BasicParametersMixin, BaseEngineSpec):
 
         try:
             cursor.execute(f"KILL CONNECTION {cancel_query_id}")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return True

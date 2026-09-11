@@ -466,7 +466,6 @@ class MySQLEngineSpec(BasicParametersMixin, BaseEngineSpec):
         if isinstance(type_code, int):
             if not cls.type_code_map:
                 # only import and store if needed at least once
-                # pylint: disable=import-outside-toplevel
                 try:
                     import MySQLdb
 
@@ -532,7 +531,7 @@ class MySQLEngineSpec(BasicParametersMixin, BaseEngineSpec):
 
         try:
             cursor.execute(f"KILL CONNECTION {cancel_query_id}")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return True

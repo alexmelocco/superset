@@ -156,7 +156,7 @@ class ImpalaEngineSpec(BaseEngineSpec):
                 #  updates progress info by log
                 try:
                     log = cursor.get_log() or ""
-                except Exception:  # pylint: disable=broad-except
+                except Exception:
                     logger.warning("Call to GetLog() failed")
                     log = ""
 
@@ -179,7 +179,7 @@ class ImpalaEngineSpec(BaseEngineSpec):
                 )
                 time.sleep(sleep_interval)
                 status = cursor.status()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             logger.debug("Call to status() failed ")
             return
 
@@ -237,7 +237,7 @@ class ImpalaEngineSpec(BaseEngineSpec):
             # Do not follow redirects: a validated host could otherwise 30x the
             # request to an internal target, bypassing the is_safe_host check.
             response = requests.post(url, timeout=3, allow_redirects=False)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return bool(response and response.status_code == 200)
