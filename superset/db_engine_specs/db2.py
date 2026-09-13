@@ -132,7 +132,7 @@ class Db2EngineSpec(BaseEngineSpec):
         try:
             table_comment = inspector.get_table_comment(table.table, table.schema)
             return table_comment.get("text")
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.error("Unexpected error while fetching table comment", exc_info=True)
             logger.exception(ex)
             return None

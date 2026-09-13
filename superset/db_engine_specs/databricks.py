@@ -664,9 +664,7 @@ class DatabricksNativeEngineSpec(DatabricksDynamicBaseEngineSpec):
         query = {}
         if parameters.get("encryption"):
             if not cls.encryption_parameters:
-                raise Exception(  # pylint: disable=broad-exception-raised
-                    "Unable to build a URL with encryption enabled"
-                )
+                raise Exception("Unable to build a URL with encryption enabled")
             query.update(cls.encryption_parameters)
 
         # SQLAlchemy 2.0 made URL.__str__() hide the password by default

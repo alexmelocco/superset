@@ -128,7 +128,7 @@ class OdpsEngineSpec(BasicParametersMixin, OdpsBaseEngineSpec):
             }
 
     @classmethod
-    def select_star(  # pylint: disable=too-many-arguments
+    def select_star(
         cls,
         database: Database,
         table: Table,
@@ -156,7 +156,6 @@ class OdpsEngineSpec(BasicParametersMixin, OdpsBaseEngineSpec):
         :param cols: Columns to include in query
         :return: SQL query
         """
-        # pylint: disable=redefined-outer-name
         fields: str | list[Any] = "*"
         cols = cols or []
         if (show_cols or latest_partition) and not cols:

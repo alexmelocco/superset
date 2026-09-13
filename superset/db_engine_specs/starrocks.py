@@ -375,7 +375,7 @@ class StarRocksEngineSpec(MySQLEngineSpec):
                         continue
 
                 return catalogs
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.exception("Error fetching catalog names from SHOW CATALOGS: %s", ex)
             return set()
 
@@ -391,7 +391,7 @@ class StarRocksEngineSpec(MySQLEngineSpec):
             with inspector.engine.connect() as conn:
                 result = conn.execute(text("SHOW DATABASES"))
                 return {row[0] for row in result}
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.exception("Error fetching schema names from SHOW DATABASES: %s", ex)
             return set()
 

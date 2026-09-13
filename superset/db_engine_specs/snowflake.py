@@ -231,7 +231,6 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
         "docs_url": "https://docs.snowflake.com/en/user-guide/key-pair-auth.html",
     }
 
-    # pylint: disable=invalid-name
     encrypted_extra_sensitive_fields = {
         "$.auth_params.privatekey_body": "Private Key Body",
         "$.auth_params.privatekey_pass": "Private Key Password",
@@ -367,7 +366,7 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
         cls,
         config: OAuth2ClientConfig,
         state: OAuth2State,
-        code_verifier: str | None = None,  # pylint: disable=unused-argument
+        code_verifier: str | None = None,
     ) -> str:
         """
         Return URI for initial OAuth2 request.
@@ -545,7 +544,7 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
 
         try:
             cursor.execute(f"SELECT SYSTEM$CANCEL_ALL_QUERIES({cancel_query_id})")
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return True
@@ -554,9 +553,7 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
     def build_sqlalchemy_uri(
         cls,
         parameters: SnowflakeParametersType,
-        encrypted_extra: Optional[  # pylint: disable=unused-argument
-            dict[str, Any]
-        ] = None,
+        encrypted_extra: Optional[dict[str, Any]] = None,
     ) -> str:
         # SQLAlchemy 2.0 made URL.__str__() hide the password by default
         # (it rendered in full under 1.4); render_as_string(hide_password=
@@ -578,9 +575,7 @@ class SnowflakeEngineSpec(PostgresBaseEngineSpec):
     def get_parameters_from_uri(
         cls,
         uri: str,
-        encrypted_extra: Optional[  # pylint: disable=unused-argument
-            dict[str, str]
-        ] = None,
+        encrypted_extra: Optional[dict[str, str]] = None,
     ) -> Any:
         url = make_url_safe(uri)
         query = dict(url.query.items())

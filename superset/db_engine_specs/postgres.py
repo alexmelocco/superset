@@ -627,7 +627,7 @@ class PostgresEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
     encryption_parameters = {"sslmode": "require"}
 
     max_column_name_length = 63
-    try_remove_schema_from_table_name = False  # pylint: disable=invalid-name
+    try_remove_schema_from_table_name = False
 
     # Sensitive fields that should be masked in encrypted_extra.
     # This follows the pattern used by other engine specs (bigquery, snowflake, etc.)
@@ -695,7 +695,7 @@ class PostgresEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
         if search_path := options.get("search_path"):
             schemas = search_path.split(",")
             if len(schemas) > 1:
-                raise Exception(  # pylint: disable=broad-exception-raised
+                raise Exception(
                     "Multiple schemas are configured in the search path, which means "
                     "Superset is unable to determine the schema of unqualified table "
                     "names and enforce permissions."
@@ -986,7 +986,6 @@ WHERE datistemplate = false;
 
     @classmethod
     def get_datatype(cls, type_code: Any) -> str | None:
-        # pylint: disable=import-outside-toplevel
         from psycopg2.extensions import binary_types, string_types
 
         types = binary_types.copy()
@@ -1030,7 +1029,7 @@ WHERE datistemplate = false;
                 "FROM pg_stat_activity "
                 f"WHERE pid='{cancel_query_id}'"
             )
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return True

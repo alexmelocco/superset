@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# pylint: disable=too-many-lines
 
 from __future__ import annotations
 
@@ -163,7 +162,7 @@ builtin_time_grains: dict[str | None, str] = {
 }
 
 
-class TimestampExpression(ColumnClause):  # pylint: disable=abstract-method, too-many-ancestors
+class TimestampExpression(ColumnClause):
     def __init__(self, expr: str, col: ColumnClause, **kwargs: Any) -> None:
         """Sqlalchemy class that can be used to render native column elements respecting
         engine-specific quoting rules as part of a string-based expression.
@@ -370,7 +369,7 @@ class DBEngineSpecMetadata(TypedDict, total=False):
     advanced_features: dict[str, str]
 
 
-class BaseEngineSpec:  # pylint: disable=too-many-public-methods
+class BaseEngineSpec:
     """Abstract class for database engine specific configurations
 
     Attributes:
@@ -623,7 +622,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     # fetched for cursor.description to be populated.
     type_probe_needs_row: bool = False
     requires_column_value_normalization: bool = False
-    try_remove_schema_from_table_name = True  # pylint: disable=invalid-name
+    try_remove_schema_from_table_name = True
     run_multiple_statements_as_one = False
     custom_errors: dict[
         Pattern[str], tuple[str, SupersetErrorType, dict[str, Any]]
@@ -632,7 +631,6 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     # JSONPath fields in `encrypted_extra` that should be masked when the database is
     # edited. Can be a set of paths (labels will default to the path) or a dict mapping
     # paths to human-readable labels for import validation error messages.
-    # pylint: disable=invalid-name
     encrypted_extra_sensitive_fields: set[str] | dict[str, str] = {
         "$.*": "Encrypted Extra",
     }
@@ -702,7 +700,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     # the user impersonation methods to handle personal tokens.
     supports_oauth2 = False
     oauth2_scope = ""
-    oauth2_authorization_request_uri: str | None = None  # pylint: disable=invalid-name
+    oauth2_authorization_request_uri: str | None = None
     oauth2_token_request_uri: str | None = None
     oauth2_token_request_type = "data"  # noqa: S105
 
@@ -1008,7 +1006,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def get_allows_alias_in_select(
         cls,
-        database: Database,  # pylint: disable=unused-argument
+        database: Database,
     ) -> bool:
         """
         Method for dynamic `allows_alias_in_select`.
@@ -1074,7 +1072,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def get_default_catalog(
         cls,
-        database: Database,  # pylint: disable=unused-argument
+        database: Database,
     ) -> str | None:
         """
         Return the default catalog for a given database.
@@ -1090,7 +1088,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             return inspector.default_schema_name
 
     @classmethod
-    def get_schema_from_engine_params(  # pylint: disable=unused-argument
+    def get_schema_from_engine_params(
         cls,
         sqlalchemy_uri: URL,
         connect_args: dict[str, Any],
@@ -1183,7 +1181,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return new_exception(str(exception))
 
     @classmethod
-    def get_allow_cost_estimate(  # pylint: disable=unused-argument
+    def get_allow_cost_estimate(
         cls,
         extra: dict[str, Any],
     ) -> bool:
@@ -1718,7 +1716,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
             df.to_sql(con=engine, **to_sql_kwargs)
 
     @classmethod
-    def convert_dttm(  # pylint: disable=unused-argument
+    def convert_dttm(
         cls, target_type: str, dttm: datetime, db_extra: dict[str, Any] | None = None
     ) -> str | None:
         """
@@ -1902,7 +1900,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         ]
 
     @classmethod
-    def adjust_engine_params(  # pylint: disable=unused-argument
+    def adjust_engine_params(
         cls,
         uri: URL,
         connect_args: dict[str, Any],
@@ -1934,9 +1932,9 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def get_prequeries(
         cls,
-        database: Database,  # pylint: disable=unused-argument
-        catalog: str | None = None,  # pylint: disable=unused-argument
-        schema: str | None = None,  # pylint: disable=unused-argument
+        database: Database,
+        catalog: str | None = None,
+        schema: str | None = None,
     ) -> list[str]:
         """
         Return pre-session queries.
@@ -1960,7 +1958,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
 
     @classmethod
-    def get_catalog_names(  # pylint: disable=unused-argument
+    def get_catalog_names(
         cls,
         database: Database,
         inspector: Inspector,
@@ -1984,7 +1982,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return set(inspector.get_schema_names())
 
     @classmethod
-    def get_table_names(  # pylint: disable=unused-argument
+    def get_table_names(
         cls,
         database: Database,
         inspector: Inspector,
@@ -2013,7 +2011,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return tables
 
     @classmethod
-    def get_view_names(  # pylint: disable=unused-argument
+    def get_view_names(
         cls,
         database: Database,
         inspector: Inspector,
@@ -2056,7 +2054,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
     @classmethod
     def get_indexes(
         cls,
-        database: Database,  # pylint: disable=unused-argument
+        database: Database,
         inspector: Inspector,
         table: Table,
     ) -> list[dict[str, Any]]:
@@ -2090,13 +2088,13 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         except NotImplementedError:
             # It's expected that some dialects don't implement the comment method
             pass
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.error("Unexpected error while fetching table comment", exc_info=True)
             logger.exception(ex)
         return comment
 
     @classmethod
-    def get_columns(  # pylint: disable=unused-argument
+    def get_columns(
         cls,
         inspector: Inspector,
         table: Table,
@@ -2121,7 +2119,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         )
 
     @classmethod
-    def get_metrics(  # pylint: disable=unused-argument
+    def get_metrics(
         cls,
         database: Database,
         inspector: Inspector,
@@ -2140,7 +2138,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         ]
 
     @classmethod
-    def where_latest_partition(  # pylint: disable=unused-argument
+    def where_latest_partition(
         cls,
         database: Database,
         table: Table,
@@ -2172,7 +2170,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         ]
 
     @classmethod
-    def select_star(  # pylint: disable=too-many-arguments
+    def select_star(
         cls,
         database: Database,
         table: Table,
@@ -2201,7 +2199,6 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         if not cls.supports_cross_catalog_queries:
             table = Table(table.table, table.schema, None)
 
-        # pylint: disable=redefined-outer-name
         fields: str | list[Any] = "*"
         cols = cols or []
         if (show_cols or latest_partition) and not cols:
@@ -2242,9 +2239,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         :param cursor: Cursor instance
         :return: Dictionary with different costs
         """
-        raise Exception(  # pylint: disable=broad-exception-raised
-            "Database does not support cost estimation"
-        )
+        raise Exception("Database does not support cost estimation")
 
     @classmethod
     def query_cost_formatter(
@@ -2256,9 +2251,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         :param raw_cost: Raw estimate from `estimate_query_cost`
         :return: Human readable cost estimate
         """
-        raise Exception(  # pylint: disable=broad-exception-raised
-            "Database does not support cost estimation"
-        )
+        raise Exception("Database does not support cost estimation")
 
     @classmethod
     def process_statement(
@@ -2276,7 +2269,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return database.mutate_sql_based_on_config(str(statement), is_split=True)
 
     @classmethod
-    def estimate_query_cost(  # pylint: disable=too-many-arguments
+    def estimate_query_cost(
         cls,
         database: Database,
         catalog: str | None,
@@ -2294,9 +2287,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
         extra = database.get_extra(source) or {}
         if not cls.get_allow_cost_estimate(extra):
-            raise Exception(  # pylint: disable=broad-exception-raised
-                "Database does not support cost estimation"
-            )
+            raise Exception("Database does not support cost estimation")
 
         parsed_script = SQLScript(sql, engine=cls.engine)
 
@@ -2353,7 +2344,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         url: URL,
         impersonate_user: bool,
         username: str | None,
-        access_token: str | None,  # pylint: disable=unused-argument
+        access_token: str | None,
     ) -> URL:
         """
         Return a modified URL with the username set.
@@ -2370,7 +2361,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
 
     @classmethod
     @deprecated(deprecated_in="6.0.0")
-    def update_impersonation_config(  # pylint: disable=too-many-arguments
+    def update_impersonation_config(
         cls,
         database: Database,
         connect_args: dict[str, Any],
@@ -2391,7 +2382,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         """
 
     @classmethod
-    def execute(  # pylint: disable=unused-argument
+    def execute(
         cls,
         cursor: Any,
         query: str,
@@ -2533,7 +2524,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return sqla_column_type.compile(dialect=dialect).upper()
 
     @classmethod
-    def get_function_names(  # pylint: disable=unused-argument
+    def get_function_names(
         cls,
         database: Database,
     ) -> list[str]:
@@ -2599,7 +2590,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return data
 
     @staticmethod
-    def mutate_db_for_connection_test(  # pylint: disable=unused-argument
+    def mutate_db_for_connection_test(
         database: Database,
     ) -> None:
         """
@@ -2633,7 +2624,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return extra
 
     @staticmethod
-    def update_params_from_encrypted_extra(  # pylint: disable=invalid-name
+    def update_params_from_encrypted_extra(
         database: Database, params: dict[str, Any]
     ) -> None:
         """
@@ -2733,9 +2724,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         )
 
     @classmethod
-    def get_array_element_type(  # pylint: disable=unused-argument
-        cls, native_type: str | None
-    ) -> GenericDataType | None:
+    def get_array_element_type(cls, native_type: str | None) -> GenericDataType | None:
         """
         Return the generic type of an array column's **element** type, derived
         from its native type string (e.g. ClickHouse ``Array(Int32)`` ->
@@ -2752,7 +2741,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return None
 
     @classmethod
-    def get_column_spec(  # pylint: disable=unused-argument
+    def get_column_spec(
         cls,
         native_type: str | None,
         db_extra: dict[str, Any] | None = None,
@@ -2796,7 +2785,6 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         )
         return column_spec.sqla_type if column_spec else None
 
-    # pylint: disable=unused-argument
     @classmethod
     def prepare_cancel_query(cls, query: Query) -> None:
         """
@@ -2820,7 +2808,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return False
 
     @classmethod
-    def get_cancel_query_id(  # pylint: disable=unused-argument
+    def get_cancel_query_id(
         cls,
         cursor: Any,
         query: Query,
@@ -2859,7 +2847,7 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return bool(re.fullmatch(pattern, str(cancel_query_id)))
 
     @classmethod
-    def cancel_query(  # pylint: disable=unused-argument
+    def cancel_query(
         cls,
         cursor: Any,
         query: Query,
@@ -3099,7 +3087,7 @@ class BasicParametersMixin:
     required_parameters: set[str] = {"host", "port", "username", "database"}
 
     @classmethod
-    def build_sqlalchemy_uri(  # pylint: disable=unused-argument
+    def build_sqlalchemy_uri(
         cls,
         parameters: BasicParametersType,
         encrypted_extra: dict[str, str] | None = None,
@@ -3109,9 +3097,7 @@ class BasicParametersMixin:
         query = parameters.get("query", {}).copy()
         if parameters.get("encryption"):
             if not cls.encryption_parameters:
-                raise Exception(  # pylint: disable=broad-exception-raised
-                    "Unable to build a URL with encryption enabled"
-                )
+                raise Exception("Unable to build a URL with encryption enabled")
             query.update(cls.encryption_parameters)
         else:
             query.update(cls.encryption_disable_parameters)
@@ -3131,7 +3117,7 @@ class BasicParametersMixin:
         ).render_as_string(hide_password=False)
 
     @classmethod
-    def get_parameters_from_uri(  # pylint: disable=unused-argument
+    def get_parameters_from_uri(
         cls, uri: str, encrypted_extra: dict[str, Any] | None = None
     ) -> BasicParametersType:
         url = make_url_safe(uri)

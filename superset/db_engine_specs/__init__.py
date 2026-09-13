@@ -78,7 +78,7 @@ def load_engine_specs() -> list[type[BaseEngineSpec]]:
     for ep in entry_points(group="superset.db_engine_specs"):
         try:
             engine_spec = ep.load()
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             logger.warning("Unable to load Superset DB engine spec: %s", ep.name)
             continue
         # Validate that the engine spec is a proper subclass of BaseEngineSpec
@@ -129,7 +129,6 @@ backend_replacements = {
 }
 
 
-# pylint: disable=too-many-branches
 def get_available_engine_specs() -> dict[type[BaseEngineSpec], set[str]]:  # noqa: C901
     """
     Return available engine specs and installed drivers for them.
@@ -154,7 +153,7 @@ def get_available_engine_specs() -> dict[type[BaseEngineSpec], set[str]]:  # noq
                         dialect.dbapi()
                 except ModuleNotFoundError:
                     continue
-                except Exception as ex:  # pylint: disable=broad-except
+                except Exception as ex:
                     logger.warning("Unable to load dialect %s: %s", dialect, ex)
                     continue
                 drivers[attr].add(dialect.driver)
@@ -165,7 +164,7 @@ def get_available_engine_specs() -> dict[type[BaseEngineSpec], set[str]]:  # noq
     for ep in entry_points(group="sqlalchemy.dialects"):
         try:
             dialect = ep.load()
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.debug("Unable to load SQLAlchemy dialect %s: %s", ep.name, ex)
         else:
             # A third-party entry point can load successfully yet not resolve to

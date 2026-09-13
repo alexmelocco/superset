@@ -319,7 +319,6 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         except AttributeError:
             with contextlib.suppress(AttributeError):
                 conn = cursor.connection
-                # pylint: disable=protected-access, line-too-long
                 return f"{conn.http_scheme}://{conn.host}:{conn.port}/ui/query.html?{cursor._query.query_id}"
         return None
 
@@ -443,7 +442,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
                     for key, value in g_copy.__dict__.items():
                         setattr(g, key, value)
                     cls.execute(cursor, sql, query_database)
-            except Exception as ex:  # pylint: disable=broad-except
+            except Exception as ex:
                 results["error"] = ex
             finally:
                 event.set()
@@ -453,8 +452,8 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
             args=(
                 execute_result,
                 execute_event,
-                app._get_current_object(),  # pylint: disable=protected-access
-                g._get_current_object(),  # pylint: disable=protected-access
+                app._get_current_object(),
+                g._get_current_object(),
             ),
         )
         execute_thread.start()
@@ -510,7 +509,7 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
                 "message => 'Query cancelled by Superset')"
             )
             cursor.fetchall()  # needed to trigger the call
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
         return True
@@ -556,7 +555,6 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
 
             connect_args = params.setdefault("connect_args", {})
             connect_args["http_scheme"] = "https"
-            # pylint: disable=import-outside-toplevel
             if auth_method == "basic":
                 from trino.auth import BasicAuthentication as trino_auth  # noqa
             elif auth_method == "kerberos":
@@ -584,7 +582,6 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel
         from requests import exceptions as requests_exceptions
         from trino import exceptions as trino_exceptions
 
@@ -628,7 +625,6 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         the column correctly instead of quoting the whole dotted name as a single
         (invalid) identifier.
         """
-        # pylint: disable=import-outside-toplevel
         from trino.sqlalchemy import datatype
 
         cols = [col]
