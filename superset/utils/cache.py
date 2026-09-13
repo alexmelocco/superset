@@ -264,7 +264,7 @@ def etag_cache(  # noqa: C901
                 key_args = list(args)
                 key_kwargs = kwargs.copy()
                 key_kwargs.update(request.args)
-                cache_key = wrapper.make_cache_key(  # type: ignore
+                cache_key = wrapper.make_cache_key(  # type: ignore[attr-defined]
                     f, *key_args, **key_kwargs
                 )
                 response = cache.get(cache_key)
@@ -322,9 +322,9 @@ def etag_cache(  # noqa: C901
 
             return response.make_conditional(request)
 
-        wrapper.uncached = f  # type: ignore
-        wrapper.cache_timeout = timeout  # type: ignore
-        wrapper.make_cache_key = cache._memoize_make_cache_key(  # type: ignore # pylint: disable=protected-access
+        wrapper.uncached = f  # type: ignore[attr-defined]
+        wrapper.cache_timeout = timeout  # type: ignore[attr-defined]
+        wrapper.make_cache_key = cache._memoize_make_cache_key(  # type: ignore[attr-defined] # pylint: disable=protected-access
             make_name=None, hash_method=configurable_hash_method
         )
 
