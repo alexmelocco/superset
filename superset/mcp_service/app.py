@@ -896,45 +896,51 @@ from superset.mcp_service.user.tool import (  # noqa: F401, E402
 ALLOWED_UNPROTECTED: frozenset[str] = frozenset({"generate_bug_report"})
 
 
+#: Component kinds (FastMCP ``local_provider._components`` key prefixes) that
+#: must go through ``mcp_auth_hook``. ``template`` is a URI-templated resource.
+_PROTECTED_COMPONENT_KINDS: frozenset[str] = frozenset(
+    {"tool", "prompt", "resource", "template"}
+)
+
+
 def assert_all_tools_protected(mcp_instance: FastMCP) -> None:
-    """Fail loudly at startup if any registered tool bypassed ``mcp_auth_hook``.
+    """Fail loudly at startup if any registered component bypassed
+    ``mcp_auth_hook``.
 
-    The fresh-app-context-per-call fix in #39385 only protects tools that
-    actually go through ``mcp_auth_hook``. This catches all three known bypass
-    paths (see #39395):
+    The fresh-app-context-per-call fix in #39385 only protects components that
+    actually go through ``mcp_auth_hook``. This catches the known bypass paths
+    (see #39395) for tools, prompts and resources alike:
 
-    * ``@tool(protect=False)`` — the wrapper is skipped entirely.
-    * Silent fallback in ``create_tool_decorator`` (now fail-fast, but a future
-      regression could reintroduce it).
-    * Direct ``mcp.add_tool()`` calls that skip the decorator.
+    * ``@tool(protect=False)`` / ``@prompt(protect=False)`` /
+      ``@resource(protect=False)`` — the wrapper is skipped entirely.
+    * Silent fallback in the ``create_*_decorator`` helpers (fail-fast, but a
+      future regression could reintroduce it).
+    * Direct ``mcp.add_tool()`` / ``@mcp.prompt`` / ``@mcp.resource`` calls
+      that skip the decorator.
 
     Raises:
-        RuntimeError: if any tool's underlying function lacks the
-            ``_mcp_auth_protected`` marker set by ``mcp_auth_hook``.
+        RuntimeError: if any tool, prompt or resource's underlying function
+            lacks the ``_mcp_auth_protected`` marker set by ``mcp_auth_hook``.
     """
     # FastMCP 3.x exposes components keyed as ``"<kind>:<name>@..."`` (tools,
-    # prompts, resources) in the local provider's component dict. Tool values
-    # are ``FunctionTool`` objects with ``.name`` and ``.fn`` attributes.
+    # prompts, resources, templates) in the local provider's component dict.
+    # Values are ``Function*`` objects with ``.name`` and ``.fn`` attributes.
     tools_checked = 0
     for key, component in mcp_instance.local_provider._components.items():
-        # Prompts and resources are intentionally skipped here. They use the
-        # same ``mcp_auth_hook`` (via ``create_prompt_decorator`` and the
-        # resource-level ``@mcp_auth_hook`` convention documented in
-        # ``mcp_service/CLAUDE.md``) but their bypass surface is different —
-        # ``protect=False`` on a prompt would need its own ``assert_all_
-        # prompts_protected`` check. Tracked as a follow-up per @aminghadersohi.
-        if not key.startswith("tool:"):
+        kind, _, _ = key.partition(":")
+        if kind not in _PROTECTED_COMPONENT_KINDS:
             continue
         tools_checked += 1
         name = getattr(component, "name", None) or key
         fn = getattr(component, "fn", None)
-        if name in ALLOWED_UNPROTECTED:
+        if kind == "tool" and name in ALLOWED_UNPROTECTED:
             continue
         if not getattr(fn, "_mcp_auth_protected", False):
             raise RuntimeError(
-                f"SECURITY: MCP tool '{name}' registered without mcp_auth_hook. "
-                f"All tools must use @tool() with protect=True or be explicitly "
-                f"allowlisted in ALLOWED_UNPROTECTED."
+                f"SECURITY: MCP {kind} '{name}' registered without mcp_auth_hook. "
+                f"All tools, prompts and resources must use the @tool()/@prompt()/"
+                f"@resource() decorators with protect=True; tools may alternatively "
+                f"be explicitly allowlisted in ALLOWED_UNPROTECTED."
             )
 
     # Defense against silent FastMCP API drift: if the private
@@ -945,7 +951,7 @@ def assert_all_tools_protected(mcp_instance: FastMCP) -> None:
     if tools_checked == 0:
         logger.warning(
             "assert_all_tools_protected inspected 0 tools — FastMCP internal "
-            "API (local_provider._components, 'tool:' key prefix) may have "
+            "API (local_provider._components, '<kind>:' key prefix) may have "
             "changed. Review and update the iteration in app.py."
         )
 

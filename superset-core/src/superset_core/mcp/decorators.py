@@ -183,3 +183,46 @@ def prompt(
         "MCP prompt decorator not initialized. "
         "This decorator should be replaced during Superset startup."
     )
+
+
+def resource(
+    uri: str,
+    *,
+    name: str | None = None,
+    title: str | None = None,
+    description: str | None = None,
+    mime_type: str | None = None,
+    tags: set[str] | None = None,
+    protect: bool = True,
+) -> Any:  # Use Any to avoid mypy issues with dependency injection
+    """
+    Decorator to register an MCP resource with optional authentication.
+
+    This decorator combines FastMCP resource registration with optional
+    authentication, so resources do not need a separate ``@mcp_auth_hook``.
+
+    Usage:
+        @resource("superset://schema/chart")
+        def get_chart_schema_resource() -> str:
+            '''Schema metadata for the chart model.'''
+            return "..."
+
+    Args:
+        uri: Resource URI (e.g. ``"superset://schema/chart"``)
+        name: Resource name (defaults to function name)
+        title: Resource title (defaults to function name)
+        description: Resource description (defaults to function docstring)
+        mime_type: MIME type of the resource content
+        tags: Set of tags for categorizing the resource
+        protect: Whether to require Superset authentication (defaults to True)
+
+    Returns:
+        Decorator function that registers and wraps the resource
+
+    Raises:
+        NotImplementedError: If called before host implementation is initialized
+    """
+    raise NotImplementedError(
+        "MCP resource decorator not initialized. "
+        "This decorator should be replaced during Superset startup."
+    )

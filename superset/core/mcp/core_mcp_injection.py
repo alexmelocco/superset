@@ -279,6 +279,84 @@ def create_prompt_decorator(
     return parameterized_decorator
 
 
+def create_resource_decorator(
+    uri: str,
+    *,
+    name: Optional[str] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    mime_type: Optional[str] = None,
+    tags: Optional[set[str]] = None,
+    protect: bool = True,
+) -> Callable[[F], F]:
+    """
+    Create the concrete MCP resource decorator implementation.
+
+    This combines FastMCP resource registration with optional Superset
+    authentication, replacing the need for separate @mcp.resource and
+    @mcp_auth_hook decorators.
+
+    Args:
+        uri: Resource URI (e.g. ``"superset://schema/chart"``)
+        name: Resource name (defaults to function name)
+        title: Resource title (defaults to function name)
+        description: Resource description (defaults to function docstring)
+        mime_type: MIME type of the resource content
+        tags: Set of tags for categorization
+        protect: Whether to apply Superset authentication (defaults to True)
+
+    Returns:
+        Decorator that registers and wraps the resource with optional authentication
+    """
+
+    def decorator(func: F) -> F:
+        try:
+            # Import here to avoid circular imports
+            from superset.mcp_service.app import mcp
+
+            resource_name = name or func.__name__
+            resource_title = title or func.__name__
+            resource_description = (
+                description or func.__doc__ or f"Resource: {resource_name}"
+            )
+            resource_tags = tags or set()
+
+            # Conditionally apply authentication wrapper
+            if protect:
+                from superset.mcp_service.auth import mcp_auth_hook
+
+                wrapped_func = mcp_auth_hook(func)
+            else:
+                wrapped_func = func
+
+            mcp.resource(
+                uri,
+                name=resource_name,
+                title=resource_title,
+                description=resource_description,
+                mime_type=mime_type,
+                tags=resource_tags,
+            )(wrapped_func)
+
+            protected_status = "protected" if protect else "public"
+            logger.info(
+                "Registered MCP resource: %s (%s)",
+                uri,
+                protected_status,
+            )
+            return wrapped_func
+
+        except Exception as e:
+            # Fail-fast: don't silently serve unprotected resources. Returning
+            # the unwrapped function here would bypass mcp_auth_hook, leaving
+            # the resource exposed without auth or context isolation (same
+            # invariant as create_tool_decorator / create_prompt_decorator).
+            logger.error("Failed to register MCP resource %s: %s", uri, e)
+            raise
+
+    return decorator
+
+
 def initialize_core_mcp_dependencies() -> None:
     """
     Initialize MCP dependency injection by replacing abstract functions
@@ -300,6 +378,7 @@ def initialize_core_mcp_dependencies() -> None:
     # Replace the abstract decorators with concrete implementations
     superset_core.mcp.decorators.tool = create_tool_decorator
     superset_core.mcp.decorators.prompt = create_prompt_decorator
+    superset_core.mcp.decorators.resource = create_resource_decorator
 
     logger.info("MCP dependency injection initialized successfully")
 

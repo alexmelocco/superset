@@ -21,8 +21,10 @@ The race-condition fix in #39385 only protects tools that go through
 enforce that invariant:
 
 1. ``mcp_auth_hook`` stamps ``_mcp_auth_protected = True`` on the wrapper.
-2. ``assert_all_tools_protected`` raises if any tool lacks the marker.
-3. ``create_tool_decorator`` fails fast instead of returning the unwrapped
+2. ``assert_all_tools_protected`` raises if any tool, prompt or resource lacks
+   the marker.
+3. ``create_tool_decorator`` / ``create_prompt_decorator`` /
+   ``create_resource_decorator`` fail fast instead of returning the unwrapped
    function when registration errors.
 """
 
@@ -35,6 +37,7 @@ import pytest
 
 from superset.core.mcp.core_mcp_injection import (
     create_prompt_decorator,
+    create_resource_decorator,
     create_tool_decorator,
 )
 from superset.mcp_service.app import assert_all_tools_protected
@@ -45,8 +48,8 @@ def _fake_mcp_with_tools(tools_by_name: dict[str, Any]) -> SimpleNamespace:
     """Build a minimal FastMCP stand-in exposing ``local_provider._components``.
 
     FastMCP 3.x keys components as ``"<kind>:<name>@"`` — tools, prompts and
-    resources all share the dict. ``assert_all_tools_protected`` filters to the
-    ``tool:`` entries, so the fake mirrors that shape.
+    resources all share the dict. The fake mirrors that shape for ``tool:``
+    entries; tests covering other kinds build the dict by hand.
     """
     components = {f"tool:{name}@": tool for name, tool in tools_by_name.items()}
     return SimpleNamespace(
@@ -158,37 +161,117 @@ def test_create_prompt_decorator_fails_fast_on_registration_error() -> None:
             decorator(sample_prompt)
 
 
-def test_assert_all_tools_protected_skips_non_tool_components() -> None:
-    """``local_provider._components`` mixes tools, prompts and resources under
-    different key prefixes. Only ``tool:`` entries should be checked — prompts
-    and resources have their own auth model and must not trip the assertion."""
+def test_create_resource_decorator_fails_fast_on_registration_error() -> None:
+    """``create_resource_decorator`` must propagate registration errors instead
+    of returning the unwrapped function — same invariant as tools/prompts."""
+
+    def sample_resource() -> str:
+        return "hi"
+
+    decorator: Callable[..., Any] = create_resource_decorator("test://sample")
+    with patch(
+        "fastmcp.resources.Resource.from_function", side_effect=RuntimeError("boom")
+    ):
+        with pytest.raises(RuntimeError, match="boom"):
+            decorator(sample_resource)
+
+
+def _fake_mcp_with_components(components: dict[str, Any]) -> SimpleNamespace:
+    return SimpleNamespace(
+        local_provider=SimpleNamespace(_components=components),
+    )
+
+
+def _marked(fn: Callable[..., Any]) -> Callable[..., Any]:
+    fn._mcp_auth_protected = True  # type: ignore[attr-defined]
+    return fn
+
+
+def test_assert_all_tools_protected_passes_when_prompts_and_resources_marked() -> None:
+    """Tools, prompts and resources that all went through ``mcp_auth_hook``
+    must pass the startup assertion."""
 
     def protected_fn() -> None:
         pass
 
-    protected_fn._mcp_auth_protected = True  # type: ignore[attr-defined]
+    _marked(protected_fn)
+    mcp = _fake_mcp_with_components(
+        {
+            "tool:list_charts@": SimpleNamespace(name="list_charts", fn=protected_fn),
+            "prompt:create_chart_guided@": SimpleNamespace(
+                name="create_chart_guided", fn=protected_fn
+            ),
+            "resource:chart://configs@": SimpleNamespace(
+                name="chart://configs", fn=protected_fn
+            ),
+            "template:superset://schema/{model}@": SimpleNamespace(
+                name="superset://schema/{model}", fn=protected_fn
+            ),
+        }
+    )
+
+    # Should not raise.
+    assert_all_tools_protected(mcp)
+
+
+@pytest.mark.parametrize(
+    ("key", "kind", "name"),
+    [
+        ("prompt:create_chart_guided@", "prompt", "create_chart_guided"),
+        ("resource:chart://configs@", "resource", "chart://configs"),
+        ("template:superset://schema/{model}@", "template", "superset://schema/"),
+    ],
+)
+def test_assert_all_tools_protected_raises_on_unprotected_non_tool_component(
+    key: str, kind: str, name: str
+) -> None:
+    """``local_provider._components`` mixes tools, prompts and resources under
+    different key prefixes. An unprotected prompt or resource (``protect=False``
+    or a bare ``@mcp.prompt`` / ``@mcp.resource``) must trip the assertion just
+    like an unprotected tool would."""
+
+    def protected_fn() -> None:
+        pass
+
+    _marked(protected_fn)
 
     def unprotected_fn() -> None:
         pass
 
-    # Hand-craft a components dict directly so prompt/resource keys are present
-    # (the helper only builds ``tool:`` entries).
-    components = {
-        "tool:list_charts@": SimpleNamespace(name="list_charts", fn=protected_fn),
-        "prompt:create_chart_guided@": SimpleNamespace(
-            name="create_chart_guided", fn=unprotected_fn
-        ),
-        "resource:chart://configs@": SimpleNamespace(
-            name="chart://configs", fn=unprotected_fn
-        ),
-    }
-    mcp = SimpleNamespace(
-        local_provider=SimpleNamespace(_components=components),
+    mcp = _fake_mcp_with_components(
+        {
+            "tool:list_charts@": SimpleNamespace(name="list_charts", fn=protected_fn),
+            key: SimpleNamespace(name=name, fn=unprotected_fn),
+        }
     )
 
-    # Should not raise — the unprotected prompt/resource entries are skipped
-    # because their keys don't start with ``tool:``.
-    assert_all_tools_protected(mcp)
+    with pytest.raises(
+        RuntimeError, match=f"MCP {kind} '{name}.*without mcp_auth_hook"
+    ):
+        assert_all_tools_protected(mcp)
+
+
+def test_assert_all_tools_protected_allowlist_does_not_cover_non_tools() -> None:
+    """``ALLOWED_UNPROTECTED`` is a *tool* allowlist — a prompt or resource
+    sharing a listed name must still be rejected."""
+
+    def unprotected_fn() -> None:
+        pass
+
+    mcp = _fake_mcp_with_components(
+        {
+            "prompt:generate_bug_report@": SimpleNamespace(
+                name="generate_bug_report", fn=unprotected_fn
+            ),
+        }
+    )
+
+    with patch(
+        "superset.mcp_service.app.ALLOWED_UNPROTECTED",
+        frozenset({"generate_bug_report"}),
+    ):
+        with pytest.raises(RuntimeError, match="MCP prompt 'generate_bug_report'"):
+            assert_all_tools_protected(mcp)
 
 
 def test_assert_all_tools_protected_warns_when_no_tools_found(

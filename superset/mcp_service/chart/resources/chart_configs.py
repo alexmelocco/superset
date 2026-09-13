@@ -21,14 +21,12 @@ Chart resources for valid ChartConfig examples and templates
 
 import logging
 
-from superset.mcp_service.app import mcp
-from superset.mcp_service.auth import mcp_auth_hook
+from superset_core.mcp.decorators import resource
 
 logger = logging.getLogger(__name__)
 
 
-@mcp.resource("chart://configs")
-@mcp_auth_hook
+@resource("chart://configs")
 def get_chart_configs_resource() -> str:
     """
     Provide valid ChartConfig examples that match the exact schema.

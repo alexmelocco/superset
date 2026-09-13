@@ -26,15 +26,12 @@ get_dataset_info or execute_sql without an extra list call.
 import logging
 
 from sqlalchemy.exc import SQLAlchemyError
-
-from superset.mcp_service.app import mcp
-from superset.mcp_service.auth import mcp_auth_hook
+from superset_core.mcp.decorators import resource
 
 logger = logging.getLogger(__name__)
 
 
-@mcp.resource("instance://metadata")
-@mcp_auth_hook
+@resource("instance://metadata")
 def get_instance_metadata_resource() -> str:
     """
     Provide instance metadata with available dataset and database IDs.

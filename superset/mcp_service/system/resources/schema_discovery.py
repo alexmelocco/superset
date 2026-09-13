@@ -27,8 +27,7 @@ without making API calls.
 import logging
 from typing import Any
 
-from superset.mcp_service.app import mcp
-from superset.mcp_service.auth import mcp_auth_hook
+from superset_core.mcp.decorators import resource
 
 logger = logging.getLogger(__name__)
 
@@ -100,8 +99,7 @@ def _build_schema_resource(model_type: str) -> dict[str, Any]:
     return schemas.get(model_type, {})
 
 
-@mcp.resource("superset://schema/chart")
-@mcp_auth_hook
+@resource("superset://schema/chart")
 def get_chart_schema_resource() -> str:
     """
     Schema metadata for chart model.
@@ -119,8 +117,7 @@ def get_chart_schema_resource() -> str:
     return json.dumps(_build_schema_resource("chart"), indent=2)
 
 
-@mcp.resource("superset://schema/dataset")
-@mcp_auth_hook
+@resource("superset://schema/dataset")
 def get_dataset_schema_resource() -> str:
     """
     Schema metadata for dataset model.
@@ -138,8 +135,7 @@ def get_dataset_schema_resource() -> str:
     return json.dumps(_build_schema_resource("dataset"), indent=2)
 
 
-@mcp.resource("superset://schema/dashboard")
-@mcp_auth_hook
+@resource("superset://schema/dashboard")
 def get_dashboard_schema_resource() -> str:
     """
     Schema metadata for dashboard model.
@@ -157,8 +153,7 @@ def get_dashboard_schema_resource() -> str:
     return json.dumps(_build_schema_resource("dashboard"), indent=2)
 
 
-@mcp.resource("superset://schema/all")
-@mcp_auth_hook
+@resource("superset://schema/all")
 def get_all_schemas_resource() -> str:
     """
     Combined schema metadata for all model types (chart, dataset, dashboard).
