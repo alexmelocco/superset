@@ -67,7 +67,7 @@ try:
     from databricks.sql.utils import ParamEscaper
 except ImportError:
 
-    class ParamEscaper:  # type: ignore
+    class ParamEscaper:  # type: ignore[no-redef]
         """Dummy class."""
 
 
@@ -531,16 +531,16 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
         return super().extract_errors(ex, context, database_name)
 
     @classmethod
-    def validate_parameters(  # type: ignore
+    def validate_parameters(
         cls,
-        properties: Union[
+        properties: Union[  # type: ignore[override]
             DatabricksNativePropertiesType,
             DatabricksPythonConnectorPropertiesType,
         ],
     ) -> list[SupersetError]:
         errors: list[SupersetError] = []
         connect_args: dict[str, Any] = {}
-        if extra := json.loads(properties.get("extra")):  # type: ignore
+        if extra := json.loads(properties.get("extra") or "{}"):
             engine_params = extra.get("engine_params", {})
             connect_args = engine_params.get("connect_args", {})
         parameters = {
@@ -566,7 +566,7 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
         if not host:
             return errors
 
-        if not is_hostname_valid(host):  # type: ignore
+        if not is_hostname_valid(host):  # type: ignore[arg-type]
             errors.append(
                 SupersetError(
                     message="The hostname provided can't be resolved.",
@@ -581,7 +581,7 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
         if not port:
             return errors
         try:
-            port = int(port)  # type: ignore
+            port = int(port)  # type: ignore[call-overload]
         except (ValueError, TypeError):
             errors.append(
                 SupersetError(
@@ -602,7 +602,7 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
                     extra={"invalid": ["port"]},
                 ),
             )
-        elif not is_port_open(host, port):  # type: ignore
+        elif not is_port_open(host, port):  # type: ignore[arg-type]
             errors.append(
                 SupersetError(
                     message="The port is closed.",
@@ -658,8 +658,8 @@ class DatabricksNativeEngineSpec(DatabricksDynamicBaseEngineSpec):
     oauth2_token_request_uri = ""
 
     @classmethod
-    def build_sqlalchemy_uri(  # type: ignore
-        cls, parameters: DatabricksNativeParametersType, *_
+    def build_sqlalchemy_uri(  # type: ignore[override]
+        cls, parameters: DatabricksNativeParametersType, *_: Any
     ) -> str:
         query = {}
         if parameters.get("encryption"):
@@ -684,8 +684,8 @@ class DatabricksNativeEngineSpec(DatabricksDynamicBaseEngineSpec):
         ).render_as_string(hide_password=False)
 
     @classmethod
-    def get_parameters_from_uri(  # type: ignore
-        cls, uri: str, *_, **__
+    def get_parameters_from_uri(  # type: ignore[override]
+        cls, uri: str, *_: Any, **__: Any
     ) -> DatabricksNativeParametersType:
         url = make_url_safe(uri)
         encryption = all(
@@ -885,8 +885,8 @@ class DatabricksPythonConnectorEngineSpec(DatabricksDynamicBaseEngineSpec):
     oauth2_token_request_uri = ""
 
     @classmethod
-    def build_sqlalchemy_uri(  # type: ignore
-        cls, parameters: DatabricksPythonConnectorParametersType, *_
+    def build_sqlalchemy_uri(  # type: ignore[override]
+        cls, parameters: DatabricksPythonConnectorParametersType, *_: Any
     ) -> str:
         query = {}
         if http_path := parameters.get("http_path_field"):
@@ -912,7 +912,7 @@ class DatabricksPythonConnectorEngineSpec(DatabricksDynamicBaseEngineSpec):
         ).render_as_string(hide_password=False)
 
     @classmethod
-    def get_parameters_from_uri(  # type: ignore
+    def get_parameters_from_uri(  # type: ignore[override]
         cls, uri: str, *_: Any, **__: Any
     ) -> DatabricksPythonConnectorParametersType:
         url = make_url_safe(uri)

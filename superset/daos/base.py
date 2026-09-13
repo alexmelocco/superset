@@ -519,14 +519,14 @@ class BaseDAO(CoreBaseDAO[T], Generic[T]):
         """
 
         if not item:
-            item = cls.model_cls()  # type: ignore  # pylint: disable=not-callable
+            item = cls.model_cls()  # type: ignore[misc]  # pylint: disable=not-callable
 
         if attributes:
             for key, value in attributes.items():
                 setattr(item, key, value)
 
         db.session.add(item)
-        return item  # type: ignore
+        return item  # type: ignore[return-value]
 
     @classmethod
     def update(
@@ -542,7 +542,7 @@ class BaseDAO(CoreBaseDAO[T], Generic[T]):
         """
 
         if not item:
-            item = cls.model_cls()  # type: ignore  # pylint: disable=not-callable
+            item = cls.model_cls()  # type: ignore[misc]  # pylint: disable=not-callable
 
         if attributes:
             for key, value in attributes.items():
@@ -551,7 +551,7 @@ class BaseDAO(CoreBaseDAO[T], Generic[T]):
         if item not in db.session:
             return db.session.merge(item)
 
-        return item  # type: ignore
+        return item  # type: ignore[return-value]
 
     @classmethod
     def soft_delete(cls, items: list[T]) -> None:

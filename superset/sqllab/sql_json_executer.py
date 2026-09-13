@@ -104,10 +104,13 @@ class SynchronousSqlJsonExecutor(SqlJsonExecutorBase):
                 utils.error_msg_from_exception(ex)
             ) from ex
 
-        if data.get("status") == QueryStatus.FAILED:  # type: ignore
+        if data.get("status") == QueryStatus.FAILED:  # type: ignore[union-attr]
             # new error payload with rich context
-            if data["errors"]:  # type: ignore
-                errors = [SupersetError(**params) for params in data["errors"]]  # type: ignore
+            if data["errors"]:  # type: ignore[index]
+                errors = [
+                    SupersetError(**params)
+                    for params in data["errors"]  # type: ignore[index]
+                ]
                 status = (
                     500
                     if any(error.level == ErrorLevel.ERROR for error in errors)
@@ -115,7 +118,7 @@ class SynchronousSqlJsonExecutor(SqlJsonExecutorBase):
                 )
                 raise SupersetErrorsException(errors, status=status)
             # old string-only error message
-            raise SupersetGenericDBErrorException(data["error"])  # type: ignore
+            raise SupersetGenericDBErrorException(data["error"])  # type: ignore[index]
 
         return SqlJsonExecutionStatus.HAS_RESULTS
 
@@ -170,7 +173,7 @@ class ASynchronousSqlJsonExecutor(SqlJsonExecutorBase):
         query_id = execution_context.query.id
         logger.info("Query %i: Running query on a Celery worker", query_id)
         try:
-            task = self._get_sql_results_task.delay(  # type: ignore
+            task = self._get_sql_results_task.delay(  # type: ignore[attr-defined]
                 query_id,
                 rendered_query,
                 return_results=False,

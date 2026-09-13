@@ -848,10 +848,10 @@ class ImportExportMixin(UUIDMixin):
         """Get all (single column and multi column) unique constraints"""
         unique = [
             {c.name for c in u.columns}
-            for u in cls.__table_args__  # type: ignore
+            for u in cls.__table_args__  # type: ignore[attr-defined]
             if isinstance(u, UniqueConstraint)
         ]
-        unique.extend({c.name} for c in cls.__table__.columns if c.unique)  # type: ignore
+        unique.extend({c.name} for c in cls.__table__.columns if c.unique)  # type: ignore[attr-defined]
         return unique
 
     @classmethod
@@ -885,7 +885,7 @@ class ImportExportMixin(UUIDMixin):
 
         schema: dict[str, Any] = {
             column.name: formatter(column)
-            for column in cls.__table__.columns  # type: ignore
+            for column in cls.__table__.columns  # type: ignore[attr-defined]
             if (column.name in cls.export_fields and column.name not in parent_excludes)
         }
         if recursive:
@@ -1112,7 +1112,7 @@ class ImportExportMixin(UUIDMixin):
             # Convert c.name to str to handle SQLAlchemy's quoted_name type
             # which is not YAML-serializable
             str(c.name): getattr(self, c.name)
-            for c in cls.__table__.columns  # type: ignore
+            for c in cls.__table__.columns  # type: ignore[attr-defined]
             if (
                 c.name in export_fields
                 and c.name not in parent_excludes
@@ -1210,7 +1210,7 @@ class ImportExportMixin(UUIDMixin):
 
     @property
     def template_params_dict(self) -> dict[Any, Any]:
-        return json_to_dict(self.template_params)  # type: ignore
+        return json_to_dict(self.template_params)  # type: ignore[attr-defined]
 
 
 def _user(user: User) -> str:
@@ -1396,7 +1396,7 @@ class SoftDeleteMixin:
     def is_deleted(self) -> bool:
         return self.deleted_at is not None
 
-    @is_deleted.expression  # type: ignore
+    @is_deleted.expression  # type: ignore[no-redef]
     def is_deleted(cls) -> ColumnElement:  # noqa: N805
         return cls.deleted_at.is_not(None)
 
@@ -3858,11 +3858,11 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
             return value
 
         if isinstance(values, (list, tuple)):
-            values = [handle_single_value(v) for v in values]  # type: ignore
+            values = [handle_single_value(v) for v in values]  # type: ignore[misc]
         else:
             values = handle_single_value(values)
         if is_list_target and not isinstance(values, (tuple, list)):
-            values = [values]  # type: ignore
+            values = [values]  # type: ignore[list-item]
         elif not is_list_target and isinstance(values, (tuple, list)):
             values = values[0] if values else None
         return values
@@ -5087,7 +5087,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
                     )
                     and col_advanced_data_type in ADVANCED_DATA_TYPES
                 ):
-                    values = eq if is_list_target else [eq]  # type: ignore
+                    values = eq if is_list_target else [eq]  # type: ignore[list-item]
                     bus_resp: AdvancedDataTypeResponse = ADVANCED_DATA_TYPES[
                         col_advanced_data_type
                     ].translate_type(

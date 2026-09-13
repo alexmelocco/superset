@@ -99,7 +99,7 @@ class ExecuteSqlCommand(BaseCommand):
         try:
             query = self._try_get_existing_query()
             if self.is_query_handled(query):
-                self._execution_context.set_query(query)  # type: ignore
+                self._execution_context.set_query(query)  # type: ignore[arg-type]
                 status = SqlJsonExecutionStatus.QUERY_ALREADY_CREATED
             else:
                 status = self._run_sql_json_exec_from_scratch()
@@ -251,14 +251,14 @@ class ExecuteSqlCommand(BaseCommand):
         )
 
     def _set_query_limit(self, rendered_query: str) -> None:
-        db_engine_spec = self._execution_context.database.db_engine_spec  # type: ignore
+        db_engine_spec = self._execution_context.database.db_engine_spec  # type: ignore[union-attr]
         limits = [
             db_engine_spec.get_limit_from_sql(rendered_query),
             self._execution_context.limit,
         ]
-        if limits[0] is None or limits[0] > limits[1]:  # type: ignore
+        if limits[0] is None or limits[0] > limits[1]:  # type: ignore[operator]
             self._execution_context.query.limiting_factor = LimitingFactor.DROPDOWN
-        elif limits[1] > limits[0]:  # type: ignore
+        elif limits[1] > limits[0]:  # type: ignore[operator]
             self._execution_context.query.limiting_factor = LimitingFactor.QUERY
         else:  # limits[0] == limits[1]
             self._execution_context.query.limiting_factor = (

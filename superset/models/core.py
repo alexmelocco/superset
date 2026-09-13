@@ -266,7 +266,7 @@ class Database(CoreDatabase, AuditMixinNullable, ImportExportMixin):  # pylint: 
     @property
     def allows_cost_estimate(self) -> bool:
         extra = self.get_extra() or {}
-        cost_estimate_enabled: bool = extra.get("cost_estimate_enabled")  # type: ignore
+        cost_estimate_enabled = bool(extra.get("cost_estimate_enabled"))
 
         return (
             self.db_engine_spec.get_allow_cost_estimate(extra) and cost_estimate_enabled
@@ -423,7 +423,7 @@ class Database(CoreDatabase, AuditMixinNullable, ImportExportMixin):  # pylint: 
             with suppress(TypeError, json.JSONDecodeError):
                 encrypted_config = json.loads(masked_encrypted_extra)
         try:
-            parameters = self.db_engine_spec.get_parameters_from_uri(  # type: ignore
+            parameters = self.db_engine_spec.get_parameters_from_uri(  # type: ignore[attr-defined]
                 masked_uri,
                 encrypted_extra=encrypted_config,
             )
@@ -435,7 +435,7 @@ class Database(CoreDatabase, AuditMixinNullable, ImportExportMixin):  # pylint: 
     @property
     def parameters_schema(self) -> dict[str, Any]:
         try:
-            parameters_schema = self.db_engine_spec.parameters_json_schema()  # type: ignore
+            parameters_schema = self.db_engine_spec.parameters_json_schema()  # type: ignore[attr-defined]
         except Exception:  # pylint: disable=broad-except
             parameters_schema = {}
         return parameters_schema
@@ -1423,7 +1423,7 @@ class Database(CoreDatabase, AuditMixinNullable, ImportExportMixin):  # pylint: 
     def perm(self) -> str:
         return f"[{self.database_name}].(id:{self.id})"
 
-    @perm.expression  # type: ignore
+    @perm.expression  # type: ignore[no-redef]
     def perm(cls) -> str:  # pylint: disable=no-self-argument  # noqa: N805
         return (
             "[" + cls.database_name + "].(id:" + expression.cast(cls.id, String) + ")"
