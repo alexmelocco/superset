@@ -42,7 +42,6 @@ const sidebars = {
         'contributing/howtos',
         'contributing/release-process',
         'contributing/resources',
-        'contributing/pkg-resources-migration',
         'guidelines/design-guidelines',
         {
           type: 'category',
