@@ -183,15 +183,16 @@ async def my_new_prompt_handler(
 
 ### How to Add a New Resource
 
-Resources use direct FastMCP decorators and **must include `@mcp_auth_hook`** for authentication:
+Resources use the `@resource` decorator from `superset_core.mcp.decorators`, which
+registers with FastMCP and applies `mcp_auth_hook` (`protect=True` by default).
+The startup invariant (`assert_all_tools_protected`) rejects any prompt or
+resource registered without it:
 
 ```python
 # superset/mcp_service/chart/resources/my_new_resource.py
-from superset.mcp_service.app import mcp
-from superset.mcp_service.auth import mcp_auth_hook  # REQUIRED for resources
+from superset_core.mcp.decorators import resource
 
-@mcp.resource("superset://chart/my_resource")
-@mcp_auth_hook  # Always add this decorator to resources
+@resource("superset://chart/my_resource")
 def get_my_resource() -> str:
     """Resource description for LLMs."""
     return "Resource data here..."
@@ -270,7 +271,7 @@ Guest tokens are verified by `GuestTokenVerifier` (in the `CompositeTokenVerifie
 before the JWT verifier) using the shared core `GUEST_TOKEN_JWT_*` config, then
 built into a `GuestUser` in `_resolve_user_from_jwt_context`. See `SECURITY.md`.
 
-**`@mcp_auth_hook`** is only used directly on **resources** — tools get auth wrapping from `@tool(protect=True)`.
+**`@mcp_auth_hook`** is applied automatically by `@tool`, `@prompt` and `@resource` (all `protect=True` by default) — do not stack it manually.
 
 ### 4. Use Pydantic Schemas
 
@@ -599,7 +600,7 @@ async def test_my_tool_success(mcp_server):
 
 ### 9. Circular Imports
 **Problem**: Importing from `app.py` in tool files causes circular dependencies.
-**Solution**: Use `from superset_core.mcp.decorators import tool` for tools/prompts. Only import `from superset.mcp_service.app import mcp` in resource files.
+**Solution**: Use `from superset_core.mcp.decorators import tool, prompt, resource` for tools/prompts/resources; never import `mcp` from `app.py` in component files.
 
 ### 10. Missing event_logger Instrumentation
 **Problem**: Tool operations are invisible to observability.
@@ -633,8 +634,7 @@ async def test_my_tool_success(mcp_server):
 
 - [ ] Created resource file in `{module}/resources/{resource_name}.py`
 - [ ] Added ASF license header
-- [ ] Used `@mcp.resource("superset://{path}")` decorator
-- [ ] Added `@mcp_auth_hook` decorator
+- [ ] Used `@resource("superset://{path}")` from `superset_core.mcp.decorators`
 - [ ] Added import to `{module}/resources/__init__.py`
 - [ ] Verified module import exists in `app.py`
 
