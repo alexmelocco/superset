@@ -70,7 +70,7 @@ def upload_to_s3(filename: str, upload_prefix: str, table: Table) -> str:
 
     if not bucket_path:
         logger.info("No upload bucket specified")
-        raise Exception(  # pylint: disable=broad-exception-raised
+        raise Exception(
             "No upload bucket specified. You can specify one in the config file."
         )
 
@@ -128,7 +128,6 @@ class HiveEngineSpec(PrestoEngineSpec):
     # function names?
     _show_functions_column = "tab_name"
 
-    # pylint: disable=line-too-long
     _time_grain_expressions = {
         None: "{col}",
         TimeGrain.SECOND: "from_unixtime(unix_timestamp({col}), 'yyyy-MM-dd HH:mm:ss')",
@@ -160,7 +159,6 @@ class HiveEngineSpec(PrestoEngineSpec):
 
     @classmethod
     def patch(cls) -> None:
-        # pylint: disable=import-outside-toplevel
         from pyhive import hive
         from TCLIService import (
             constants as patched_constants,
@@ -174,15 +172,12 @@ class HiveEngineSpec(PrestoEngineSpec):
 
     @classmethod
     def fetch_data(cls, cursor: Any, limit: int | None = None) -> list[tuple[Any, ...]]:
-        # pylint: disable=import-outside-toplevel
         import pyhive
         from TCLIService import ttypes
 
         state = cursor.poll()
         if state.operationState == ttypes.TOperationState.ERROR_STATE:
-            raise Exception(  # pylint: disable=broad-exception-raised
-                "Query error", state.errorMessage
-            )
+            raise Exception("Query error", state.errorMessage)
         try:
             return super().fetch_data(cursor, limit)
         except pyhive.exc.ProgrammingError:
@@ -406,11 +401,10 @@ class HiveEngineSpec(PrestoEngineSpec):
         return None
 
     @classmethod
-    def handle_cursor(  # pylint: disable=too-many-locals  # noqa: C901
+    def handle_cursor(  # noqa: C901
         cls, cursor: Any, query: Query
     ) -> None:
         """Updates progress information"""
-        # pylint: disable=import-outside-toplevel
         from pyhive import hive
 
         unfinished_states = (
@@ -435,7 +429,7 @@ class HiveEngineSpec(PrestoEngineSpec):
             try:
                 logs = cursor.fetch_logs()
                 log = "\n".join(logs) if logs else ""
-            except Exception:  # pylint: disable=broad-except
+            except Exception:
                 logger.warning("Call to GetLog() failed")
                 log = ""
 
@@ -505,7 +499,7 @@ class HiveEngineSpec(PrestoEngineSpec):
                 table,
                 show_first=True,
             )
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             # table is not partitioned
             return None
         if values is not None and columns is not None:
@@ -519,7 +513,7 @@ class HiveEngineSpec(PrestoEngineSpec):
 
     @classmethod
     def _get_fields(cls, cols: list[ResultSetColumnType]) -> list[ColumnClause]:
-        return BaseEngineSpec._get_fields(cols)  # pylint: disable=protected-access
+        return BaseEngineSpec._get_fields(cols)
 
     @classmethod
     def latest_sub_partition(  # type: ignore
@@ -612,7 +606,7 @@ class HiveEngineSpec(PrestoEngineSpec):
         query: str,
         database: Database,
         async_: bool = False,
-    ):  # pylint: disable=arguments-differ
+    ):
         kwargs = {"async": async_}
         cursor.execute(query, **kwargs)
 

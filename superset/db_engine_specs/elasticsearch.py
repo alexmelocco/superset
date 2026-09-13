@@ -118,7 +118,7 @@ def _fetch_page_via_cursor(
                         headers=json_headers,
                         body={"cursor": cursor},
                     )
-                except Exception:  # pylint: disable=broad-except
+                except Exception:
                     logger.warning(
                         "Failed to close Elasticsearch SQL cursor at %s",
                         close_path,
@@ -126,7 +126,7 @@ def _fetch_page_via_cursor(
                     )
 
 
-class ElasticSearchEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class ElasticSearchEngineSpec(BaseEngineSpec):
     engine = "elasticsearch"
     engine_name = "Elasticsearch"
     time_groupby_inline = True
@@ -257,7 +257,6 @@ class ElasticSearchEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-metho
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-error,import-outside-toplevel
         import es.exceptions as es_exceptions
 
         return {
@@ -283,7 +282,7 @@ class ElasticSearchEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-metho
             try:
                 if es_version:
                     supports_dttm_parse = Version(es_version) >= Version("7.8")
-            except Exception as ex:  # pylint: disable=broad-except
+            except Exception as ex:
                 logger.error("Unexpected error while convert es_version", exc_info=True)
                 logger.exception(ex)
 
@@ -298,7 +297,7 @@ class ElasticSearchEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-metho
         return None
 
 
-class OpenDistroEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class OpenDistroEngineSpec(BaseEngineSpec):
     """OpenDistro/OpenSearch SQL engine spec.
 
     Note: Documentation is consolidated in ElasticSearchEngineSpec.

@@ -103,7 +103,6 @@ def diagnose(spec: type[BaseEngineSpec]) -> dict[str, Any]:
     """
     Run basic diagnostics on a given DB engine spec.
     """
-    # pylint: disable=import-outside-toplevel
     from superset.sql_validators.postgres import PostgreSQLValidator
     from superset.sql_validators.presto_db import PrestoDBSQLValidator
 
@@ -589,7 +588,7 @@ def generate_table() -> list[list[Any]]:
     # remove 3rd party DB engine specs
     info = {k: v for k, v in info.items() if v["module"].startswith("superset")}
 
-    rows = []  # pylint: disable=redefined-outer-name
+    rows = []
     rows.append(["Feature"] + list(info))  # header row
     rows.append(["Module"] + [db_info["module"] for db_info in info.values()])
 

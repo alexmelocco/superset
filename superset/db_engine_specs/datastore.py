@@ -106,7 +106,7 @@ class DatastoreParametersType(TypedDict):
     query: dict[str, Any]
 
 
-class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-methods
+class DatastoreEngineSpec(BaseEngineSpec):
     """Engine spec for Google's Datastore
 
     As contributed by @hychang.1997.tw"""
@@ -176,7 +176,6 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
     supports_catalog = supports_dynamic_catalog = supports_cross_catalog_queries = True
 
     # when editing the database, mask this field in `encrypted_extra`
-    # pylint: disable=invalid-name
     encrypted_extra_sensitive_fields = {"$.credentials_info.private_key"}
 
     """
@@ -436,7 +435,6 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel
         from google.auth.exceptions import DefaultCredentialsError
 
         return {DefaultCredentialsError: SupersetDBAPIConnectionError}
@@ -444,7 +442,7 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
     @classmethod
     def validate_parameters(
         cls,
-        properties: BasicPropertiesType,  # pylint: disable=unused-argument
+        properties: BasicPropertiesType,
     ) -> list[SupersetError]:
         return []
 
@@ -469,7 +467,7 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
         return spec.to_dict()["components"]["schemas"][cls.__name__]
 
     @classmethod
-    def select_star(  # pylint: disable=too-many-arguments
+    def select_star(
         cls,
         database: Database,
         table: Table,
@@ -568,13 +566,13 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
     def parse_error_exception(cls, exception: Exception) -> Exception:
         try:
             return type(exception)(str(exception).splitlines()[0].strip())
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             # If for some reason we get an exception, for example, no new line
             # We will return the original exception
             return exception
 
     @classmethod
-    def get_function_names(  # pylint: disable=unused-argument
+    def get_function_names(
         cls,
         database: Database,
     ) -> list[str]:
@@ -588,7 +586,7 @@ class DatastoreEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-me
         return ["sum", "avg", "count", "count_up_to", "min", "max"]
 
     @classmethod
-    def get_view_names(  # pylint: disable=unused-argument
+    def get_view_names(
         cls,
         database: Database,
         inspector: Inspector,

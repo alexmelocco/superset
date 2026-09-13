@@ -14,7 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# pylint: disable=consider-using-transaction,too-many-lines
+# pylint: disable=consider-using-transaction
 from __future__ import annotations
 
 import contextlib
@@ -108,7 +108,7 @@ def get_children(column: ResultSetColumnType) -> list[ResultSetColumnType]:
     For rows, we return a list of the columns:
 
         >>> get_children(dict(name="a", type="ROW(BIGINT,FOO VARCHAR)",  is_dttm=False))
-        [{'name': 'a._col0', 'type': 'BIGINT', 'is_dttm': False}, {'name': 'a.foo', 'type': 'VARCHAR', 'is_dttm': False}]  # pylint: disable=line-too-long
+        [{'name': 'a._col0', 'type': 'BIGINT', 'is_dttm': False}, {'name': 'a.foo', 'type': 'VARCHAR', 'is_dttm': False}]
 
     :param column: dictionary representing a Presto column
     :return: list of dictionaries representing children columns
@@ -118,9 +118,7 @@ def get_children(column: ResultSetColumnType) -> list[ResultSetColumnType]:
         raise ValueError
     match = pattern.match(cast(str, column["type"]))
     if not match:
-        raise Exception(  # pylint: disable=broad-exception-raised
-            f"Unable to parse column type {column['type']}"
-        )
+        raise Exception(f"Unable to parse column type {column['type']}")
 
     group = match.groupdict()
     type_ = group["type"].upper()
@@ -156,7 +154,7 @@ def get_children(column: ResultSetColumnType) -> list[ResultSetColumnType]:
             columns.append(_column)
         return columns
 
-    raise Exception(f"Unknown type {type_}!")  # pylint: disable=broad-exception-raised
+    raise Exception(f"Unknown type {type_}!")
 
 
 class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
@@ -277,7 +275,6 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
         (re.compile(r"^row.*", re.IGNORECASE), Row(), GenericDataType.STRING),
     )
 
-    # pylint: disable=line-too-long
     _time_grain_expressions = {
         None: "{col}",
         TimeGrain.SECOND: "date_trunc('second', CAST({col} AS TIMESTAMP))",
@@ -483,7 +480,7 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
         return database.get_df("SHOW FUNCTIONS")["Function"].tolist()
 
     @classmethod
-    def _partition_query(  # pylint: disable=too-many-arguments,too-many-locals,unused-argument
+    def _partition_query(
         cls,
         table: Table,
         indexes: list[dict[str, Any]],
@@ -563,7 +560,7 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
     ) -> Select | None:
         try:
             col_names, values = cls.latest_partition(database, table, show_first=True)
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             # table is not partitioned
             return None
 
@@ -700,7 +697,6 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
                 msg: str = f"Field [{k}] is not part of the partitioning key"
                 raise SupersetTemplateException(msg)
         if len(kwargs.keys()) != len(part_fields) - 1:
-            # pylint: disable=consider-using-f-string
             msg = (
                 "A filter needs to be specified for {} out of the {} fields."
             ).format(len(part_fields) - 1, len(part_fields))
@@ -809,7 +805,7 @@ class PrestoBaseEngineSpec(BaseEngineSpec, metaclass=ABCMeta):
         return result
 
     @classmethod
-    def _parse_structural_column(  # pylint: disable=too-many-locals  # noqa: C901
+    def _parse_structural_column(  # noqa: C901
         cls,
         parent_column_name: str,
         parent_data_type: str,
@@ -1178,7 +1174,7 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
         return column_clauses
 
     @classmethod
-    def select_star(  # pylint: disable=too-many-arguments
+    def select_star(
         cls,
         database: Database,
         table: Table,
@@ -1215,7 +1211,7 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
         )
 
     @classmethod
-    def expand_data(  # pylint: disable=too-many-locals  # noqa: C901
+    def expand_data(  # noqa: C901
         cls, columns: list[ResultSetColumnType], data: list[dict[Any, Any]]
     ) -> tuple[
         list[ResultSetColumnType], list[dict[Any, Any]], list[ResultSetColumnType]
@@ -1379,7 +1375,6 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
         :param schema: Schema name
         :param table: Table (view) name
         """
-        # pylint: disable=import-outside-toplevel
         from pyhive.exc import DatabaseError
 
         with database.get_raw_connection(schema=schema) as conn:
@@ -1397,7 +1392,6 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
     def get_tracking_url(cls, cursor: Cursor) -> str | None:
         with contextlib.suppress(AttributeError):
             if cursor.last_query_id:
-                # pylint: disable=protected-access, line-too-long
                 return f"{cursor._protocol}://{cursor._host}:{cursor._port}/ui/query.html?{cursor.last_query_id}"
         return None
 
@@ -1458,7 +1452,6 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
             and isinstance(ex.orig[0], dict)
         ):
             error_dict = ex.orig[0]
-            # pylint: disable=consider-using-f-string
             return "{} at {}: {}".format(
                 error_dict.get("errorName"),
                 error_dict.get("errorLocation"),

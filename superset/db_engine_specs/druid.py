@@ -217,7 +217,6 @@ class DruidEngineSpec(BaseEngineSpec):
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel
         from requests import exceptions as requests_exceptions
 
         return {

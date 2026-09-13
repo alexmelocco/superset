@@ -218,7 +218,7 @@ class BigQueryParametersType(TypedDict):
     query: dict[str, Any]
 
 
-class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-methods
+class BigQueryEngineSpec(BaseEngineSpec):
     """Engine spec for Google's BigQuery
 
     As contributed by @mxmzdlv on issue #945"""
@@ -297,7 +297,6 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
     supports_grouping_sets = True
 
     # when editing the database, mask this field in `encrypted_extra`
-    # pylint: disable=invalid-name
     encrypted_extra_sensitive_fields = {
         "$.credentials_info.private_key": "Service Account Private Key",
     }
@@ -490,7 +489,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
                 g.bq_memory_limited_row_count = len(data)
             return data
 
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             # Broad catch on purpose: any failure in the size-estimation /
             # progressive-fetch path (BigQuery DB-API errors, network or
             # auth timeouts mid-fetch, ``sys.getsizeof`` raising on an
@@ -726,7 +725,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
     def _get_client(
         cls,
         engine: Engine,
-        database: Database,  # pylint: disable=unused-argument
+        database: Database,
     ) -> bigquery.Client:
         """
         Return the BigQuery client associated with an engine.
@@ -753,7 +752,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
             ) from ex
 
     @classmethod
-    def estimate_query_cost(  # pylint: disable=too-many-arguments
+    def estimate_query_cost(
         cls,
         database: Database,
         catalog: str | None,
@@ -968,7 +967,6 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
 
     @classmethod
     def get_dbapi_exception_mapping(cls) -> dict[type[Exception], type[Exception]]:
-        # pylint: disable=import-outside-toplevel
         from google.auth.exceptions import DefaultCredentialsError
 
         return {DefaultCredentialsError: SupersetDBAPIConnectionError}
@@ -976,7 +974,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
     @classmethod
     def validate_parameters(
         cls,
-        properties: BasicPropertiesType,  # pylint: disable=unused-argument
+        properties: BasicPropertiesType,
     ) -> list[SupersetError]:
         return []
 
@@ -1001,7 +999,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
         return spec.to_dict()["components"]["schemas"][cls.__name__]
 
     @classmethod
-    def select_star(  # pylint: disable=too-many-arguments
+    def select_star(
         cls,
         database: Database,
         table: Table,
@@ -1108,7 +1106,7 @@ class BigQueryEngineSpec(BaseEngineSpec):  # pylint: disable=too-many-public-met
     def parse_error_exception(cls, exception: Exception) -> Exception:
         try:
             return type(exception)(str(exception).splitlines()[0].strip())
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             # If for some reason we get an exception, for example, no new line
             # We will return the original exception
             return exception

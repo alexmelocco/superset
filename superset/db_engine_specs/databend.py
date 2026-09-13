@@ -254,7 +254,7 @@ class DatabendEngineSpec(BasicParametersMixin, DatabendBaseEngineSpec):
             ].tolist()
             cls._function_names = names
             return names
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.exception("Error retrieving system.functions: %s", str(ex))
             return []
 

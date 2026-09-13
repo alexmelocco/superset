@@ -305,7 +305,7 @@ class ClickHouseEngineSpec(ClickHouseBaseEngineSpec):
             # if the results have a single column, use that
             if len(columns) == 1:
                 return df[columns[0]].tolist()
-        except Exception as ex:  # pylint: disable=broad-except
+        except Exception as ex:
             logger.error(
                 "Query `%s` fire error %s. ",
                 system_functions_sql,
@@ -511,7 +511,6 @@ class ClickHouseConnectEngineSpec(BasicParametersMixin, ClickHouseEngineSpec):
 
     @classmethod
     def get_function_names(cls, database: Database) -> list[str]:
-        # pylint: disable=import-outside-toplevel, import-error
         from clickhouse_connect.driver.exceptions import ClickHouseError
 
         if cls._function_names:
@@ -585,7 +584,6 @@ class ClickHouseConnectEngineSpec(BasicParametersMixin, ClickHouseEngineSpec):
     def validate_parameters(
         cls, properties: BasicPropertiesType
     ) -> list[SupersetError]:
-        # pylint: disable=import-outside-toplevel, import-error
         from clickhouse_connect.driver import default_port
 
         parameters = properties.get("parameters", {})

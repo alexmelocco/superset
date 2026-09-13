@@ -18,7 +18,7 @@
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
 
 
-class SolrEngineSpec(BaseEngineSpec):  # pylint: disable=abstract-method
+class SolrEngineSpec(BaseEngineSpec):
     """Engine spec for Apache Solr"""
 
     engine = "solr"
