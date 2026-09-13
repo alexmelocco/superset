@@ -929,11 +929,14 @@ class SQLStatement(BaseSQLStatement[exp.Expression]):
             ) from ex
 
         # `sqlglot` will parse comments after the last semicolon as a separate
-        # statement; move them back to the last token in the last real statement
+        # statement; move them back to the last token in the last real statement,
+        # skipping nodes inside optimizer hints so the `/*+ ... */` block stays valid
         if len(statements) > 1 and isinstance(statements[-1], exp.Semicolon):
             last_statement = statements.pop()
             target = statements[-1]
             for node in statements[-1].walk():
+                if isinstance(node, exp.Hint) or node.find_ancestor(exp.Hint):
+                    continue
                 if hasattr(node, "comments"):  # pragma: no cover
                     target = node
 

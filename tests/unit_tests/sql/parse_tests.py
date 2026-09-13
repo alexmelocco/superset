@@ -1358,14 +1358,6 @@ LIMIT 100
     assert "increase timeout for large scans" in formatted[hint_end:]
 
 
-@pytest.mark.xfail(
-    reason=(
-        "#38189 is not fully fixed: a `;`-terminated statement still hits "
-        "the comment-relocation branch and corrupts the hint block. Only "
-        "the no-semicolon form from the original repro was fixed."
-    ),
-    strict=True,
-)
 def test_sqlscript_format_preserves_optimizer_hint_block_with_semicolon() -> None:
     """
     Same as `test_sqlscript_format_preserves_optimizer_hint_block`, but with
