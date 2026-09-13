@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# pylint: disable=too-many-lines
 import logging
 from contextvars import ContextVar
 from datetime import datetime
@@ -457,7 +456,6 @@ class ChartRestApi(SoftDeleteApiMixin, BaseSupersetModelRestApi):
             404:
               $ref: '#/components/responses/404'
         """
-        # pylint: disable=arguments-differ
         try:
             dash = ChartDAO.get_by_id_or_uuid(id_or_uuid)
             result = self.chart_get_response_schema.dump(dash)
@@ -1947,7 +1945,6 @@ class ChartRestApi(SoftDeleteApiMixin, BaseSupersetModelRestApi):
             404:
               $ref: '#/components/responses/404'
         """
-        # pylint: disable=import-outside-toplevel
         from superset.versioning.activity import activity_endpoint
 
         return activity_endpoint(self, Slice, uuid_str, request.args)
@@ -2006,7 +2003,6 @@ class ChartRestApi(SoftDeleteApiMixin, BaseSupersetModelRestApi):
             422:
               $ref: '#/components/responses/422'
         """
-        # pylint: disable=import-outside-toplevel
         # Local import: the command module transitively imports the
         # versioning bootstrap graph; see changes/listener.py.
         from superset.commands.chart.restore_version import (

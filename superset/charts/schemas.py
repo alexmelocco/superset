@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from typing import Any, TYPE_CHECKING
@@ -1105,7 +1104,7 @@ class ChartDataFilterSchema(Schema):
         },
         required=True,
     )
-    op = fields.String(  # pylint: disable=invalid-name
+    op = fields.String(
         metadata={"description": "The comparison operator.", "example": "IN"},
         validate=utils.OneOfCaseInsensitive(
             choices=[filter_op.value for filter_op in FilterOperator]
@@ -1323,7 +1322,7 @@ class ChartDataDatasourceSchema(Schema):
 
 
 class ChartDataQueryObjectSchema(Schema):
-    class Meta:  # pylint: disable=too-few-public-methods
+    class Meta:
         unknown = EXCLUDE
 
     datasource = fields.Nested(ChartDataDatasourceSchema, allow_none=True)
@@ -1686,7 +1685,6 @@ class ChartDataQueryContextSchema(Schema):
         allow_none=True,
     )
 
-    # pylint: disable=unused-argument
     @post_load
     def make_query_context(self, data: dict[str, Any], **kwargs: Any) -> QueryContext:
         # ``async_mode`` and ``tab_id`` are request-level hints (read by the API to
@@ -1699,7 +1697,6 @@ class ChartDataQueryContextSchema(Schema):
 
     def get_query_context_factory(self) -> QueryContextFactory:
         if self.query_context_factory is None:
-            # pylint: disable=import-outside-toplevel
             from superset.common.query_context_factory import QueryContextFactory
 
             self.query_context_factory = QueryContextFactory()
