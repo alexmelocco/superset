@@ -244,7 +244,7 @@ def _rollup_key(
     return tuple(str(part) for part in parts[:depth])
 
 
-def _apply_rollup_totals(  # pylint: disable=too-many-arguments,too-many-locals
+def _apply_rollup_totals(
     df: pd.DataFrame,
     rows: list[str],
     columns: list[str],
@@ -300,7 +300,7 @@ def _apply_rollup_totals(  # pylint: disable=too-many-arguments,too-many-locals
     return df
 
 
-def _rollup_denominators(  # pylint: disable=too-many-arguments,too-many-locals
+def _rollup_denominators(
     df: pd.DataFrame,
     mode: str,
     rows: list[str],
@@ -372,7 +372,7 @@ def _rollup_denominators(  # pylint: disable=too-many-arguments,too-many-locals
     return values.apply(pd.to_numeric, errors="coerce").astype(float), found
 
 
-def _apply_show_values_as(  # pylint: disable=too-many-arguments
+def _apply_show_values_as(
     df: pd.DataFrame,
     mode: str,
     axis: dict[str, int],
@@ -479,7 +479,7 @@ def _apply_show_values_as(  # pylint: disable=too-many-arguments
     return numeric / denominator.replace(0, np.nan)
 
 
-def pivot_df(  # pylint: disable=too-many-locals, too-many-arguments, too-many-statements, too-many-branches  # noqa: C901
+def pivot_df(  # noqa: C901
     df: pd.DataFrame,
     rows: list[str],
     columns: list[str],
@@ -678,7 +678,7 @@ def pivot_df(  # pylint: disable=too-many-locals, too-many-arguments, too-many-s
             for subgroup in subgroups:
                 try:
                     slice_ = df.index.get_loc(subgroup)
-                except Exception:  # pylint: disable=broad-except
+                except Exception:
                     logger.exception(
                         "Error getting location for subgroup %s from %s",
                         subgroup,
@@ -1313,9 +1313,7 @@ def apply_client_processing(  # noqa: C901
 
     for query in result["queries"]:
         if query["result_format"] not in (rf.value for rf in ChartDataResultFormat):
-            raise Exception(  # pylint: disable=broad-exception-raised
-                f"Result format {query['result_format']} not supported"
-            )
+            raise Exception(f"Result format {query['result_format']} not supported")
 
         data = query["data"]
 

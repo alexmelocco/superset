@@ -43,7 +43,7 @@ from superset.views.base_api import BaseFavoriteFilter
 from superset.views.filters import BaseDeletedRecencyFilter, BaseDeletedStateFilter
 
 
-class ChartAllTextFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartAllTextFilter(BaseFilter):
     name = _("All Text")
     arg_name = "chart_all_text"
 
@@ -61,7 +61,7 @@ class ChartAllTextFilter(BaseFilter):  # pylint: disable=too-few-public-methods
         )
 
 
-class ChartFavoriteFilter(BaseFavoriteFilter):  # pylint: disable=too-few-public-methods
+class ChartFavoriteFilter(BaseFavoriteFilter):
     """
     Custom filter for the GET list that filters all charts that a user has favored
     """
@@ -71,7 +71,7 @@ class ChartFavoriteFilter(BaseFavoriteFilter):  # pylint: disable=too-few-public
     model = Slice
 
 
-class ChartTagNameFilter(BaseTagNameFilter):  # pylint: disable=too-few-public-methods
+class ChartTagNameFilter(BaseTagNameFilter):
     """
     Custom filter for the GET list that filters all charts associated with
     a certain tag (by its name).
@@ -82,7 +82,7 @@ class ChartTagNameFilter(BaseTagNameFilter):  # pylint: disable=too-few-public-m
     model = Slice
 
 
-class ChartTagIdFilter(BaseTagIdFilter):  # pylint: disable=too-few-public-methods
+class ChartTagIdFilter(BaseTagIdFilter):
     """
     Custom filter for the GET list that filters all charts associated with
     a certain tag (by its ID).
@@ -93,7 +93,7 @@ class ChartTagIdFilter(BaseTagIdFilter):  # pylint: disable=too-few-public-metho
     model = Slice
 
 
-class ChartCertifiedFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartCertifiedFilter(BaseFilter):
     """
     Custom filter for the GET list that filters all certified charts
     """
@@ -109,7 +109,7 @@ class ChartCertifiedFilter(BaseFilter):  # pylint: disable=too-few-public-method
         return query
 
 
-class ChartFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartFilter(BaseFilter):
     def apply(self, query: Query, value: Any) -> Query:
         # Embedded guests are scoped to their token's dashboards first. A guest
         # is never entitled to all charts, regardless of what its role grants,
@@ -197,7 +197,7 @@ class ChartFilter(BaseFilter):  # pylint: disable=too-few-public-methods
         )
 
 
-class ChartEditableFilter(EditableFilter):  # pylint: disable=too-few-public-methods
+class ChartEditableFilter(EditableFilter):
     """Filter for charts the user can edit."""
 
     model = Slice
@@ -205,7 +205,7 @@ class ChartEditableFilter(EditableFilter):  # pylint: disable=too-few-public-met
     editors_fk_column = "chart_id"
 
 
-class ChartHasCreatedByFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartHasCreatedByFilter(BaseFilter):
     """
     Custom filter for the GET list that filters all charts created by user
     """
@@ -221,22 +221,20 @@ class ChartHasCreatedByFilter(BaseFilter):  # pylint: disable=too-few-public-met
         return query
 
 
-class ChartCreatedByMeFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartCreatedByMeFilter(BaseFilter):
     name = _("Created by me")
     arg_name = "chart_created_by_me"
 
     def apply(self, query: Query, value: Any) -> Query:
         return query.filter(
             or_(
-                Slice.created_by_fk  # pylint: disable=comparison-with-callable
-                == get_user_id(),
-                Slice.changed_by_fk  # pylint: disable=comparison-with-callable
-                == get_user_id(),
+                Slice.created_by_fk == get_user_id(),
+                Slice.changed_by_fk == get_user_id(),
             )
         )
 
 
-class ChartOwnedCreatedFavoredByMeFilter(BaseFilter):  # pylint: disable=too-few-public-methods
+class ChartOwnedCreatedFavoredByMeFilter(BaseFilter):
     """
     Custom filter for the GET chart that filters all charts the user
     owns, created, changed or favored.
@@ -265,7 +263,6 @@ class ChartOwnedCreatedFavoredByMeFilter(BaseFilter):  # pylint: disable=too-few
             ),
             isouter=True,
         ).filter(
-            # pylint: disable=comparison-with-callable
             or_(
                 Slice.id.in_(editor_ids_query),
                 Slice.created_by_fk == get_user_id(),
@@ -275,17 +272,13 @@ class ChartOwnedCreatedFavoredByMeFilter(BaseFilter):  # pylint: disable=too-few
         )
 
 
-class ChartDeletedRecencyFilter(  # pylint: disable=too-few-public-methods
-    BaseDeletedRecencyFilter
-):
+class ChartDeletedRecencyFilter(BaseDeletedRecencyFilter):
     """Archive time-range preset: rows archived within the last N days."""
 
     arg_name = "chart_deleted_recency"
 
 
-class ChartDeletedStateFilter(  # pylint: disable=too-few-public-methods
-    BaseDeletedStateFilter
-):
+class ChartDeletedStateFilter(BaseDeletedStateFilter):
     """Rison filter for the GET list that exposes soft-deleted charts.
 
     Restore-audience scoping (only editors and admins may enumerate
